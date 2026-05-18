@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { type Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import listingsRouter from './routers/listings.js';
@@ -6,7 +6,7 @@ import storefrontsRouter from './routers/storefronts.js';
 import hushRouter from './routers/hush.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
-const app = express();
+const app: Express = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
 // Middleware

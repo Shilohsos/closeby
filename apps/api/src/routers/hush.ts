@@ -1,6 +1,6 @@
-import { Router } from 'express';
+import { Router, type Router as RouterType } from 'express';
 
-const router = Router();
+const router: RouterType = Router();
 
 // GET /api/hush/events — approved only, public
 router.get('/events', (_req, res) => {
