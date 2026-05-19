@@ -1,8 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
-import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import { AppError } from './errorHandler.js';
 
-// Extend Express Request
 declare global {
   namespace Express {
     interface Request {
@@ -15,57 +14,37 @@ declare global {
   }
 }
 
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+);
+
 export async function requireAuth(req: Request, _res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith('Bearer ')) {
-    throw new AppError(401, 'Missing or invalid authorization header');
+    return next(new AppError(401, 'Missing or invalid authorization header'));
   }
 
-  const token = authHeader.slice(7);
+  const { data: { user }, error } = await supabase.auth.getUser(authHeader.slice(7));
 
-  try {
-    const supabaseUrl = process.env.SUPABASE_URL!;
-    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY!;
-
-    // Create minimal supabase client for verification
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false,
-        detectSessionInUrl: false,
-      },
-      cookies: {
-        get: () => undefined,
-        set: () => {},
-        remove: () => {},
-      },
-    });
-
-    const { data, error } = await supabase.auth.getUser(token);
-
-    if (error || !data.user) {
-      throw new AppError(401, 'Invalid or expired token');
-    }
-
-    req.user = {
-      id: data.user.id,
-      email: data.user.email!,
-      role: data.user.user_metadata?.role || 'buyer',
-    };
-
-    next();
-  } catch (err) {
-    if (err instanceof AppError) throw err;
-    throw new AppError(401, 'Authentication failed');
+  if (error || !user) {
+    return next(new AppError(401, 'Invalid or expired token'));
   }
+
+  req.user = {
+    id: user.id,
+    email: user.email!,
+    role: user.user_metadata?.role || 'buyer',
+  };
+
+  next();
 }
 
 export function requireRole(...roles: string[]) {
   return (req: Request, _res: Response, next: NextFunction) => {
-    if (!req.user) {
-      throw new AppError(401, 'Not authenticated');
-    }
+    if (!req.user) return next(new AppError(401, 'Not authenticated'));
     if (!roles.includes(req.user.role)) {
-      throw new AppError(403, `Requires role: ${roles.join(' or ')}`);
+      return next(new AppError(403, `Requires role: ${roles.join(' or ')}`));
     }
     next();
   };

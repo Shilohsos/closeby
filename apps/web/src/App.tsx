@@ -1,5 +1,6 @@
 import { Switch, Route } from 'wouter';
 import Navbar from './components/Navbar.tsx';
+import { requireAuth } from './guards/requireAuth.tsx';
 
 // Pages
 import Home from './pages/Home.tsx';
@@ -26,14 +27,14 @@ export default function App() {
           <Route path="/" component={Home} />
           <Route path="/browse" component={Browse} />
           <Route path="/listing/:id" component={ListingDetail} />
-          <Route path="/create" component={CreateListing} />
+          <Route path="/create" component={requireAuth(CreateListing, ['seller'])} />
           <Route path="/store/:userId" component={Storefront} />
-          <Route path="/profile" component={Profile} />
+          <Route path="/profile" component={requireAuth(Profile)} />
           <Route path="/hush" component={HushLanding} />
           <Route path="/hush/event/:id" component={EventDetail} />
-          <Route path="/hush/event/:id/buy" component={BuyTicket} />
-          <Route path="/hush/ticket/:referenceCode" component={TicketReceipt} />
-          <Route path="/hush/post" component={PostEvent} />
+          <Route path="/hush/event/:id/buy" component={requireAuth(BuyTicket)} />
+          <Route path="/hush/ticket/:referenceCode" component={requireAuth(TicketReceipt)} />
+          <Route path="/hush/post" component={requireAuth(PostEvent, ['organizer'])} />
           <Route path="/signin" component={SignIn} />
           <Route path="/signup" component={SignUp} />
           <Route path="/reset-password" component={ResetPassword} />
