@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently -n web,api -c cyan,green \"pnpm --filter @closeby/web dev\" \"pnpm --filter @closeby/api dev\"",
-    "build": "pnpm --filter @closeby/shared build && pnpm --filter @closeby/api build && pnpm --filter @closeby/web build",
+    "build": "pnpm --filter @closeby/shared build && pnpm --filter @closeby/db build && pnpm --filter @closeby/api build && pnpm --filter @closeby/web build",
     "start": "pnpm --filter @closeby/api start"
   },
   "devDependencies": {
@@ -13,5 +13,8 @@
   "engines": {
     "node": ">=24.0.0"
   },
-  "packageManager": "pnpm@10.0.0"
+  "packageManager": "pnpm@10.0.0",
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
 }
