@@ -2,8 +2,10 @@ import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
 
-export function requireAuth(Component: React.ComponentType, allowedRoles?: string[]) {
-  return function Guarded(props: Record<string, unknown>) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function requireAuth(Component: React.ComponentType<any>, allowedRoles?: string[]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function Guarded(props: any) {
     const { user, profile, loading } = useAuth();
     const [, setLocation] = useLocation();
 
