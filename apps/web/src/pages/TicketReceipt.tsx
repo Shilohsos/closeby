@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import QRCode from 'qrcode';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { get } from '@/lib/api';
 import { formatPrice } from '@/components/ListingCard';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ type TicketData = {
 };
 
 export default function TicketReceipt() {
+  usePageTitle('Ticket Receipt');
   const { referenceCode } = useParams<{ referenceCode: string }>();
   const [data, setData] = useState<TicketData | null>(null);
   const [loading, setLoading] = useState(true);

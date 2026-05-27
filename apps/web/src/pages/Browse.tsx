@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearch, useLocation } from 'wouter';
 import { useListings } from '@/hooks/useListings';
 import { useDebounce } from '@/hooks/useDebounce';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { ListingCard, ListingCardSkeleton, CATEGORY_LABELS } from '@/components/ListingCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ const LOCATIONS = [
 ];
 
 export default function Browse() {
+  usePageTitle('Browse Listings');
   const [, setLocation] = useLocation();
   const search = useSearch();
   const params = new URLSearchParams(search);

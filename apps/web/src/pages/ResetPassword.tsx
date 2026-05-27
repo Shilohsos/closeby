@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -27,6 +28,7 @@ type EmailValues = z.infer<typeof emailSchema>;
 type PasswordValues = z.infer<typeof newPasswordSchema>;
 
 export default function ResetPassword() {
+  usePageTitle('Reset Password');
   const [, setLocation] = useLocation();
   const [mode, setMode] = useState<'request' | 'update'>('request');
   const [sent, setSent] = useState(false);

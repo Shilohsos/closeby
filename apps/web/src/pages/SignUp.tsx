@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLocation, Link } from 'wouter';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -26,6 +27,7 @@ const ROLES = [
 ] as const;
 
 export default function SignUp() {
+  usePageTitle('Sign Up');
   const { signUp, signInWithGoogle } = useAuth();
   const [, setLocation] = useLocation();
   const [serverError, setServerError] = useState('');

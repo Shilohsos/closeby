@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { authPost } from '@/lib/api';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { useToast } from '@/providers/ToastProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,7 +29,9 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function PostEvent() {
+  usePageTitle('Post an Event');
   const [, navigate] = useLocation();
+  const { toast } = useToast();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -48,7 +52,10 @@ export default function PostEvent() {
         flyerUrl: values.flyerUrl || undefined,
         paymentProofUrl: values.paymentProofUrl || undefined,
       }),
-    onSuccess: () => navigate('/hush'),
+    onSuccess: () => {
+      toast({ title: 'Event submitted for review!', variant: 'success' });
+      navigate('/hush');
+    },
   });
 
   return (

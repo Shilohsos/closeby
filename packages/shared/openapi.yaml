@@ -1,0 +1,694 @@
+openapi: 3.0.3
+info:
+  title: Close By API
+  description: Nigeria's campus marketplace + Hush event platform
+  version: 1.0.0
+servers:
+  - url: https://closeby.ng/api
+    description: Production
+  - url: http://localhost:3000/api
+    description: Local development
+
+tags:
+  - name: health
+    description: Health & stats
+  - name: listings
+    description: Marketplace listings
+  - name: storefronts
+    description: Seller storefronts
+  - name: hush
+    description: Hush event platform
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing or invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Insufficient role
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    Storefront:
+      type: object
+      properties:
+        userId:
+          type: string
+        bio:
+          type: string
+          nullable: true
+        avatarUrl:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        socialLinks:
+          type: array
+          items:
+            type: string
+
+    Listing:
+      type: object
+      required: [id, userId, title, category, location, price, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        category:
+          type: string
+          enum: [housing, jobs, services, food_restaurants, electronics, fashion, events]
+        location:
+          type: string
+        price:
+          type: integer
+          description: Price in kobo (₦ × 100)
+        imageUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        seller:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/Storefront'
+
+    CreateListingInput:
+      type: object
+      required: [title, category, location, price]
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        category:
+          type: string
+          enum: [housing, jobs, services, food_restaurants, electronics, fashion, events]
+        location:
+          type: string
+        price:
+          type: integer
+          minimum: 0
+        imageUrl:
+          type: string
+          nullable: true
+
+    HushEvent:
+      type: object
+      required: [id, organizerId, title, bankName, accountNumber, accountName, ticketPrice, eventDate, location, status, capacity]
+      properties:
+        id:
+          type: string
+          format: uuid
+        organizerId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        flyerUrl:
+          type: string
+          nullable: true
+        paymentProofUrl:
+          type: string
+          nullable: true
+        bankName:
+          type: string
+        accountNumber:
+          type: string
+        accountName:
+          type: string
+        ticketPrice:
+          type: integer
+          description: Price in kobo
+        eventDate:
+          type: string
+          format: date-time
+        location:
+          type: string
+        status:
+          type: string
+          enum: [pending, approved]
+        capacity:
+          type: integer
+        soldTickets:
+          type: integer
+
+    CreateHushEventInput:
+      type: object
+      required: [title, bankName, accountNumber, accountName, ticketPrice, eventDate, location, capacity]
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 200
+        description:
+          type: string
+        flyerUrl:
+          type: string
+          format: uri
+        paymentProofUrl:
+          type: string
+          format: uri
+        bankName:
+          type: string
+        accountNumber:
+          type: string
+        accountName:
+          type: string
+        ticketPrice:
+          type: integer
+          description: Price in kobo
+        eventDate:
+          type: string
+          format: date-time
+        location:
+          type: string
+        capacity:
+          type: integer
+
+    TicketReceipt:
+      type: object
+      properties:
+        ticket:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            eventId:
+              type: string
+              format: uuid
+            buyerId:
+              type: string
+            buyerName:
+              type: string
+            referenceCode:
+              type: string
+              example: A1B2C3D4
+            createdAt:
+              type: string
+              format: date-time
+        event:
+          $ref: '#/components/schemas/HushEvent'
+
+    PaginatedListings:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Listing'
+        total:
+          type: integer
+        page:
+          type: integer
+
+    StorefrontWithListings:
+      type: object
+      properties:
+        data:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/Storefront'
+        listings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Listing'
+
+paths:
+  /health:
+    get:
+      tags: [health]
+      operationId: getHealth
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /stats:
+    get:
+      tags: [health]
+      operationId: getStats
+      summary: Marketplace statistics
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalListings:
+                    type: integer
+                  activeSellers:
+                    type: integer
+                  supportedLocations:
+                    type: integer
+
+  /listings:
+    get:
+      tags: [listings]
+      operationId: getListings
+      summary: List listings with optional filters
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Full-text search
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [housing, jobs, services, food_restaurants, electronics, fashion, events]
+        - name: location
+          in: query
+          schema:
+            type: string
+        - name: minPrice
+          in: query
+          schema:
+            type: integer
+        - name: maxPrice
+          in: query
+          schema:
+            type: integer
+        - name: userId
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 12
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedListings'
+
+    post:
+      tags: [listings]
+      operationId: createListing
+      summary: Create a listing (seller only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateListingInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Listing'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /listings/{id}:
+    get:
+      tags: [listings]
+      operationId: getListing
+      summary: Get a single listing with seller info
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Listing'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags: [listings]
+      operationId: updateListing
+      summary: Update a listing (owner only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateListingInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Listing'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [listings]
+      operationId: deleteListing
+      summary: Delete a listing (owner only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /storefronts/{userId}:
+    get:
+      tags: [storefronts]
+      operationId: getStorefront
+      summary: Get a seller's storefront and listings
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorefrontWithListings'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /storefronts/me:
+    put:
+      tags: [storefronts]
+      operationId: upsertStorefront
+      summary: Create or update own storefront
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bio:
+                  type: string
+                  maxLength: 500
+                avatarUrl:
+                  type: string
+                  nullable: true
+                phone:
+                  type: string
+                socialLinks:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Storefront'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /hush/events:
+    get:
+      tags: [hush]
+      operationId: getHushEvents
+      summary: List approved events (public)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HushEvent'
+
+    post:
+      tags: [hush]
+      operationId: createHushEvent
+      summary: Create an event for review (organizer only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHushEventInput'
+      responses:
+        '201':
+          description: Created — event pending admin approval
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/HushEvent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /hush/events/{id}:
+    get:
+      tags: [hush]
+      operationId: getHushEvent
+      summary: Get a single event (public if approved; own pending with auth)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/HushEvent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /hush/events/{id}/approve:
+    get:
+      tags: [hush]
+      operationId: approveHushEvent
+      summary: One-click admin approval link (returns HTML)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: HTML approval confirmation page
+          content:
+            text/html:
+              schema:
+                type: string
+        '403':
+          description: Invalid token (HTML)
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: Event not found (HTML)
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /hush/tickets:
+    post:
+      tags: [hush]
+      operationId: buyTicket
+      summary: Buy a ticket for an approved event
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [eventId, buyerName]
+              properties:
+                eventId:
+                  type: string
+                  format: uuid
+                buyerName:
+                  type: string
+                  maxLength: 100
+      responses:
+        '201':
+          description: Ticket issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  referenceCode:
+                    type: string
+                    example: A1B2C3D4
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /hush/tickets/{ref}:
+    get:
+      tags: [hush]
+      operationId: getTicketReceipt
+      summary: Public ticket receipt by reference code
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TicketReceipt'
+        '404':
+          $ref: '#/components/responses/NotFound'
