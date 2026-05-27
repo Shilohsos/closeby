@@ -20,6 +20,15 @@ export async function get<T>(path: string): Promise<T> {
   return handleResponse<T>(await fetch(`${BASE}${path}`));
 }
 
+export async function authGet<T>(path: string): Promise<T> {
+  const token = await getToken();
+  return handleResponse<T>(
+    await fetch(`${BASE}${path}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }),
+  );
+}
+
 export async function authPost<T>(path: string, body: unknown): Promise<T> {
   const token = await getToken();
   return handleResponse<T>(
