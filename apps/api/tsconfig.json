@@ -6,9 +6,12 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "declaration": true
+    "noEmit": true,
+    "paths": {
+      "@closeby/db": ["../../packages/db/src/index.ts"],
+      "@closeby/db/*": ["../../packages/db/src/*"],
+      "@closeby/shared": ["../../packages/shared/src/index.ts"]
+    }
   },
   "include": ["src"]
 }

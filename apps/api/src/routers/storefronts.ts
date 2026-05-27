@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Router as RouterType } from 'express';
 import { eq, desc } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../lib/db.js';
@@ -6,7 +6,7 @@ import { storefronts, listings } from '@closeby/db';
 import { requireAuth } from '../middleware/auth.js';
 import { AppError } from '../middleware/errorHandler.js';
 
-const router = Router();
+const router: RouterType = Router();
 
 const storefrontSchema = z.object({
   bio: z.string().max(500).optional(),
@@ -18,7 +18,7 @@ const storefrontSchema = z.object({
 // PUT /api/storefronts/me — must be registered before /:userId to avoid conflict
 router.put('/me', requireAuth, async (req, res) => {
   const parsed = storefrontSchema.safeParse(req.body);
-  if (!parsed.success) throw new AppError(400, parsed.error.errors.map((e) => e.message).join(', '));
+  if (!parsed.success) throw new AppError(400, parsed.error.issues.map((e: z.ZodIssue) => e.message).join(', '));
 
   const [result] = await db
     .insert(storefronts)
