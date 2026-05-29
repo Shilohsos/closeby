@@ -2,6 +2,8 @@ import 'dotenv/config';
 import express, { type Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { count, sql } from 'drizzle-orm';
 import { db } from './lib/db.js';
 import { listings } from '@closeby/db';
@@ -37,6 +39,14 @@ app.get('/api/stats', async (_req, res) => {
 app.use('/api/listings', listingsRouter);
 app.use('/api/storefronts', storefrontsRouter);
 app.use('/api/hush', hushRouter);
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const webDist = path.resolve(__dirname, '../../web/dist');
+app.use(express.static(webDist));
+
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(webDist, 'index.html'));
+});
 
 app.use(errorHandler);
 
