@@ -5,6 +5,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { ListingCard, ListingCardSkeleton, CATEGORY_LABELS } from '@/components/ListingCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const LOCATIONS = [
   'University of Lagos',
@@ -18,6 +19,7 @@ const LOCATIONS = [
 ];
 
 export default function Browse() {
+  usePageTitle('Browse Listings');
   const [, setLocation] = useLocation();
   const search = useSearch();
   const params = new URLSearchParams(search);

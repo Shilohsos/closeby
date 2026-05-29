@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription,
 } from '@/components/ui/form';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -26,6 +27,7 @@ const ROLES = [
 ] as const;
 
 export default function SignUp() {
+  usePageTitle('Sign Up');
   const { signUp, signInWithGoogle } = useAuth();
   const [, setLocation] = useLocation();
   const [serverError, setServerError] = useState('');

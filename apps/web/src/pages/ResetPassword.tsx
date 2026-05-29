@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const emailSchema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -27,6 +28,7 @@ type EmailValues = z.infer<typeof emailSchema>;
 type PasswordValues = z.infer<typeof newPasswordSchema>;
 
 export default function ResetPassword() {
+  usePageTitle('Reset Password');
   const [, setLocation] = useLocation();
   const [mode, setMode] = useState<'request' | 'update'>('request');
   const [sent, setSent] = useState(false);

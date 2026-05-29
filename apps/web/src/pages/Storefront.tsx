@@ -3,8 +3,10 @@ import { useStorefront } from '@/hooks/useStorefront';
 import { ListingCard, ListingCardSkeleton } from '@/components/ListingCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 export default function Storefront() {
+  usePageTitle('Storefront');
   const { userId } = useParams<{ userId: string }>();
   const { data, isLoading, isError } = useStorefront(userId);
 

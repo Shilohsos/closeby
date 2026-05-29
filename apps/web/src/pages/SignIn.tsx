@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -17,6 +18,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function SignIn() {
+  usePageTitle('Sign In');
   const { signIn, signInWithGoogle, profile } = useAuth();
   const [, setLocation] = useLocation();
   const [serverError, setServerError] = useState('');

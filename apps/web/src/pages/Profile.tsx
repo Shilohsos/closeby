@@ -15,6 +15,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { useToast } from '@/providers/ToastProvider';
 
 const sfSchema = z.object({
   bio: z.string().max(500).optional(),
@@ -24,10 +26,12 @@ const sfSchema = z.object({
 type SFValues = z.infer<typeof sfSchema>;
 
 export default function Profile() {
+  usePageTitle('My Profile');
   const { user, profile } = useAuth();
+  const { toast } = useToast();
   const userId = user?.id ?? '';
 
-  const { data: listingsData, isLoading: listingsLoading } = useListings({ userId, limit: 50 });
+  const { data: listingsData, isLoading: listingsLoading, isError: listingsError, refetch: refetchListings } = useListings({ userId, limit: 50 });
   const { data: storefrontData, isLoading: sfLoading } = useStorefront(userId);
   const deleteMutation = useDeleteListing();
   const updateSf = useUpdateStorefront();
@@ -45,8 +49,23 @@ export default function Profile() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this listing?')) return;
     setDeleteId(id);
-    await deleteMutation.mutateAsync(id);
-    setDeleteId(null);
+    try {
+      await deleteMutation.mutateAsync(id);
+      toast({ title: 'Listing deleted', variant: 'success' });
+    } catch {
+      toast({ title: 'Failed to delete listing', variant: 'destructive' });
+    } finally {
+      setDeleteId(null);
+    }
+  }
+
+  async function handleStorefrontSave(v: SFValues) {
+    try {
+      await updateSf.mutateAsync({ ...v, avatarUrl: v.avatarUrl || null });
+      toast({ title: 'Storefront saved', variant: 'success' });
+    } catch {
+      toast({ title: 'Failed to save storefront', variant: 'destructive' });
+    }
   }
 
   return (
@@ -74,6 +93,11 @@ export default function Profile() {
         <TabsContent value="listings">
           {listingsLoading ? (
             <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}</div>
+          ) : listingsError ? (
+            <div className="text-center py-12 space-y-3">
+              <p className="text-muted-foreground">Failed to load listings.</p>
+              <Button variant="outline" size="sm" onClick={() => refetchListings()}>Retry</Button>
+            </div>
           ) : !listingsData?.data.length ? (
             <div className="text-center py-12 text-muted-foreground">
               <p className="mb-3">No listings yet.</p>
@@ -116,7 +140,7 @@ export default function Profile() {
             <div className="space-y-4"><Skeleton className="h-10 w-full" /><Skeleton className="h-24 w-full" /><Skeleton className="h-10 w-full" /></div>
           ) : (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit((v) => updateSf.mutateAsync({ ...v, avatarUrl: v.avatarUrl || null }))} className="space-y-5 max-w-lg">
+              <form onSubmit={form.handleSubmit(handleStorefrontSave)} className="space-y-5 max-w-lg">
                 <FormField control={form.control} name="avatarUrl" render={({ field }) => (
                   <FormItem><FormLabel>Avatar URL</FormLabel><FormControl><Input type="url" placeholder="https://…" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
@@ -127,7 +151,6 @@ export default function Profile() {
                   <FormItem><FormLabel>Phone <span className="text-muted-foreground text-xs">(contact relay only)</span></FormLabel><FormControl><Input placeholder="080XXXXXXXX" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 {updateSf.isError && <p className="text-sm text-destructive">{(updateSf.error as Error).message}</p>}
-                {updateSf.isSuccess && <p className="text-sm text-primary">Saved!</p>}
                 <Button type="submit" disabled={updateSf.isPending}>{updateSf.isPending ? 'Saving…' : 'Save Storefront'}</Button>
               </form>
             </Form>

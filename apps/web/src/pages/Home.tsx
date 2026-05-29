@@ -3,6 +3,8 @@ import { useListings } from '@/hooks/useListings';
 import { useStats } from '@/hooks/useStats';
 import { ListingCard, ListingCardSkeleton } from '@/components/ListingCard';
 import { Button } from '@/components/ui/button';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { SEOHead } from '@/components/SEOHead';
 
 const CATEGORIES = [
   { slug: 'housing', label: 'Housing', icon: '🏠' },
@@ -15,14 +17,16 @@ const CATEGORIES = [
 ];
 
 export default function Home() {
-  const { data: featured, isLoading } = useListings({ limit: 6 });
-  const { data: stats } = useStats();
+  usePageTitle('Campus Marketplace');
+  const { data: featured, isLoading, isError, refetch } = useListings({ limit: 6 });
+  const { data: stats, isError: statsError } = useStats();
 
   return (
     <div className="max-w-7xl mx-auto px-4">
+      <SEOHead title="Campus Marketplace" description="Nigeria's campus marketplace — buy, sell, and connect with students near you." />
       {/* Hero */}
       <section className="text-center py-20">
-        <h1 className="text-5xl font-extrabold mb-4 leading-tight">
+        <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
           Welcome to <span className="text-primary">Close By</span>
         </h1>
         <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
@@ -37,7 +41,9 @@ export default function Home() {
           </Link>
         </div>
 
-        {stats && (
+        {statsError ? (
+          <p className="text-sm text-muted-foreground mt-8">Could not load stats.</p>
+        ) : stats && (
           <div className="flex gap-12 justify-center mt-12">
             {[
               { value: stats.totalListings, label: 'Listings' },
@@ -83,10 +89,16 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => <ListingCardSkeleton key={i} />)}
           </div>
+        ) : isError ? (
+          <div className="text-center py-16 space-y-3">
+            <p className="text-muted-foreground">Could not load listings.</p>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>Retry</Button>
+          </div>
         ) : !featured?.data.length ? (
           <div className="text-center py-16 text-muted-foreground">
             <div className="text-5xl mb-4">📦</div>
             <p className="font-medium">No listings yet — be the first to post!</p>
+            <Link href="/create"><Button className="mt-4">Post a Listing</Button></Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

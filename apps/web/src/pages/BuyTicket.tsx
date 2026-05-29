@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { useToast } from '@/providers/ToastProvider';
 
 type HushEvent = {
   id: string;
@@ -22,9 +24,11 @@ type HushEvent = {
 };
 
 export default function BuyTicket() {
+  usePageTitle('Buy Ticket');
   const { id } = useParams<{ id: string }>();
   const { profile } = useAuth();
   const [, navigate] = useLocation();
+  const { toast } = useToast();
 
   const [event, setEvent] = useState<HushEvent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -58,6 +62,7 @@ export default function BuyTicket() {
         eventId: event.id,
         buyerName: buyerName.trim(),
       });
+      toast({ title: 'Ticket issued!', description: 'Your ticket is ready.', variant: 'success' });
       navigate(`/hush/ticket/${referenceCode}`);
     } catch (e) {
       setError((e as Error).message);

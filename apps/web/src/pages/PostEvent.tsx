@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { useToast } from '@/providers/ToastProvider';
 
 const schema = z.object({
   title: z.string().min(3, 'Event name must be at least 3 characters').max(200),
@@ -27,7 +29,9 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function PostEvent() {
+  usePageTitle('Post an Event');
   const [, navigate] = useLocation();
+  const { toast } = useToast();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -48,7 +52,10 @@ export default function PostEvent() {
         flyerUrl: values.flyerUrl || undefined,
         paymentProofUrl: values.paymentProofUrl || undefined,
       }),
-    onSuccess: () => navigate('/hush'),
+    onSuccess: () => {
+      toast({ title: 'Event submitted for review!', description: 'We will notify you once it is approved.', variant: 'success' });
+      navigate('/hush');
+    },
   });
 
   return (

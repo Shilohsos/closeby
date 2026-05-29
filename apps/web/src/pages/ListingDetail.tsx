@@ -5,10 +5,14 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { SEOHead } from '@/components/SEOHead';
 
 export default function ListingDetail() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, isError } = useListing(id);
+  const title = data?.data?.title;
+  usePageTitle(title ? `Listing: ${title}` : 'Listing');
 
   if (isLoading) {
     return (
@@ -36,6 +40,7 @@ export default function ListingDetail() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+      <SEOHead title={`Listing: ${listing.title}`} description={listing.description ?? undefined} image={listing.imageUrl ?? undefined} />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <div className="aspect-video bg-secondary rounded-xl overflow-hidden">
