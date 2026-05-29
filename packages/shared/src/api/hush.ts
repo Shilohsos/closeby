@@ -5,10 +5,7 @@
  * Nigeria's campus marketplace — listings, storefronts, and Hush events
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,8 +18,8 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
   ApproveHushEventParams,
@@ -33,718 +30,974 @@ import type {
   ErrorResponse,
   GetHushEvent200,
   GetHushEvents200,
-  GetTicket200
-} from './closeByAPI.schemas';
-
-
-
-
-
+  GetTicket200,
+} from "./closeByAPI.schemas";
 
 export type getHushEventsResponse200 = {
-  data: GetHushEvents200
-  status: 200
-}
+  data: GetHushEvents200;
+  status: 200;
+};
 
-export type getHushEventsResponseSuccess = (getHushEventsResponse200) & {
+export type getHushEventsResponseSuccess = getHushEventsResponse200 & {
   headers: Headers;
 };
-;
-
-export type getHushEventsResponse = (getHushEventsResponseSuccess)
+export type getHushEventsResponse = getHushEventsResponseSuccess;
 
 export const getGetHushEventsUrl = () => {
-
-
-
-
-  return `/hush/events`
-}
+  return `/hush/events`;
+};
 
 /**
  * @summary List approved Hush events sorted by date
  */
-export const getHushEvents = async ( options?: RequestInit): Promise<getHushEventsResponse> => {
-
-  const res = await fetch(getGetHushEventsUrl(),
-  {
+export const getHushEvents = async (
+  options?: RequestInit,
+): Promise<getHushEventsResponse> => {
+  const res = await fetch(getGetHushEventsUrl(), {
     ...options,
-    method: 'GET'
-
-
-  }
-)
-
+    method: "GET",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getHushEventsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getHushEventsResponse
-}
-
-
-
-
+  const data: getHushEventsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getHushEventsResponse;
+};
 
 export const getGetHushEventsQueryKey = () => {
-    return [
-    `/hush/events`
-    ] as const;
-    }
+  return [`/hush/events`] as const;
+};
 
+export const getGetHushEventsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getHushEvents>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getHushEvents>>, TError, TData>
+  >;
+  fetch?: RequestInit;
+}) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-export const getGetHushEventsQueryOptions = <TData = Awaited<ReturnType<typeof getHushEvents>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHushEvents>>, TError, TData>>, fetch?: RequestInit}
-) => {
+  const queryKey = queryOptions?.queryKey ?? getGetHushEventsQueryKey();
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getHushEvents>>> = ({
+    signal,
+  }) => getHushEvents({ signal, ...fetchOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getGetHushEventsQueryKey();
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getHushEvents>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type GetHushEventsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getHushEvents>>
+>;
+export type GetHushEventsQueryError = unknown;
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHushEvents>>> = ({ signal }) => getHushEvents({ signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHushEvents>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetHushEventsQueryResult = NonNullable<Awaited<ReturnType<typeof getHushEvents>>>
-export type GetHushEventsQueryError = unknown
-
-
-export function useGetHushEvents<TData = Awaited<ReturnType<typeof getHushEvents>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHushEvents>>, TError, TData>> & Pick<
+export function useGetHushEvents<
+  TData = Awaited<ReturnType<typeof getHushEvents>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getHushEvents>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getHushEvents>>,
           TError,
           Awaited<ReturnType<typeof getHushEvents>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetHushEvents<TData = Awaited<ReturnType<typeof getHushEvents>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHushEvents>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetHushEvents<
+  TData = Awaited<ReturnType<typeof getHushEvents>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getHushEvents>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getHushEvents>>,
           TError,
           Awaited<ReturnType<typeof getHushEvents>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetHushEvents<TData = Awaited<ReturnType<typeof getHushEvents>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHushEvents>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetHushEvents<
+  TData = Awaited<ReturnType<typeof getHushEvents>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getHushEvents>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List approved Hush events sorted by date
  */
 
-export function useGetHushEvents<TData = Awaited<ReturnType<typeof getHushEvents>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHushEvents>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetHushEvents<
+  TData = Awaited<ReturnType<typeof getHushEvents>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getHushEvents>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetHushEventsQueryOptions(options);
 
-  const queryOptions = getGetHushEventsQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
-
-
-
-
-
 export type createHushEventResponse201 = {
-  data: CreateHushEvent201
-  status: 201
-}
+  data: CreateHushEvent201;
+  status: 201;
+};
 
 export type createHushEventResponse401 = {
-  data: ErrorResponse
-  status: 401
-}
-
-export type createHushEventResponseSuccess = (createHushEventResponse201) & {
-  headers: Headers;
-};
-export type createHushEventResponseError = (createHushEventResponse401) & {
-  headers: Headers;
+  data: ErrorResponse;
+  status: 401;
 };
 
-export type createHushEventResponse = (createHushEventResponseSuccess | createHushEventResponseError)
+export type createHushEventResponseSuccess = createHushEventResponse201 & {
+  headers: Headers;
+};
+export type createHushEventResponseError = createHushEventResponse401 & {
+  headers: Headers;
+};
+
+export type createHushEventResponse =
+  | createHushEventResponseSuccess
+  | createHushEventResponseError;
 
 export const getCreateHushEventUrl = () => {
-
-
-
-
-  return `/hush/events`
-}
+  return `/hush/events`;
+};
 
 /**
  * @summary Submit an event for review (organizer only)
  */
-export const createHushEvent = async (createHushEventBody: CreateHushEventBody, options?: RequestInit): Promise<createHushEventResponse> => {
-
-  const res = await fetch(getCreateHushEventUrl(),
-  {
+export const createHushEvent = async (
+  createHushEventBody: CreateHushEventBody,
+  options?: RequestInit,
+): Promise<createHushEventResponse> => {
+  const res = await fetch(getCreateHushEventUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createHushEventBody)
-  }
-)
-
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createHushEventBody),
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: createHushEventResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createHushEventResponse
-}
+  const data: createHushEventResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createHushEventResponse;
+};
 
+export const getCreateHushEventMutationOptions = <
+  TError = ErrorResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createHushEvent>>,
+    TError,
+    { data: CreateHushEventBody },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createHushEvent>>,
+  TError,
+  { data: CreateHushEventBody },
+  TContext
+> => {
+  const mutationKey = ["createHushEvent"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createHushEvent>>,
+    { data: CreateHushEventBody }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return createHushEvent(data, fetchOptions);
+  };
 
-export const getCreateHushEventMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHushEvent>>, TError,{data: CreateHushEventBody}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof createHushEvent>>, TError,{data: CreateHushEventBody}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['createHushEvent'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+export type CreateHushEventMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createHushEvent>>
+>;
+export type CreateHushEventMutationBody = CreateHushEventBody;
+export type CreateHushEventMutationError = ErrorResponse;
 
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createHushEvent>>, {data: CreateHushEventBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createHushEvent(data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateHushEventMutationResult = NonNullable<Awaited<ReturnType<typeof createHushEvent>>>
-    export type CreateHushEventMutationBody = CreateHushEventBody
-    export type CreateHushEventMutationError = ErrorResponse
-
-    /**
+/**
  * @summary Submit an event for review (organizer only)
  */
-export const useCreateHushEvent = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHushEvent>>, TError,{data: CreateHushEventBody}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createHushEvent>>,
-        TError,
-        {data: CreateHushEventBody},
-        TContext
-      > => {
-      return useMutation(getCreateHushEventMutationOptions(options), queryClient);
-    }
-    export type getHushEventResponse200 = {
-  data: GetHushEvent200
-  status: 200
-}
+export const useCreateHushEvent = <TError = ErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createHushEvent>>,
+      TError,
+      { data: CreateHushEventBody },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createHushEvent>>,
+  TError,
+  { data: CreateHushEventBody },
+  TContext
+> => {
+  return useMutation(getCreateHushEventMutationOptions(options), queryClient);
+};
+export type getHushEventResponse200 = {
+  data: GetHushEvent200;
+  status: 200;
+};
 
 export type getHushEventResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type getHushEventResponseSuccess = (getHushEventResponse200) & {
-  headers: Headers;
-};
-export type getHushEventResponseError = (getHushEventResponse404) & {
-  headers: Headers;
+  data: ErrorResponse;
+  status: 404;
 };
 
-export type getHushEventResponse = (getHushEventResponseSuccess | getHushEventResponseError)
+export type getHushEventResponseSuccess = getHushEventResponse200 & {
+  headers: Headers;
+};
+export type getHushEventResponseError = getHushEventResponse404 & {
+  headers: Headers;
+};
 
-export const getGetHushEventUrl = (id: string,) => {
+export type getHushEventResponse =
+  | getHushEventResponseSuccess
+  | getHushEventResponseError;
 
-
-
-
-  return `/hush/events/${id}`
-}
+export const getGetHushEventUrl = (id: string) => {
+  return `/hush/events/${id}`;
+};
 
 /**
  * @summary Get event detail — public if approved, own-pending for organizer
  */
-export const getHushEvent = async (id: string, options?: RequestInit): Promise<getHushEventResponse> => {
-
-  const res = await fetch(getGetHushEventUrl(id),
-  {
+export const getHushEvent = async (
+  id: string,
+  options?: RequestInit,
+): Promise<getHushEventResponse> => {
+  const res = await fetch(getGetHushEventUrl(id), {
     ...options,
-    method: 'GET'
-
-
-  }
-)
-
+    method: "GET",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getHushEventResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getHushEventResponse
-}
+  const data: getHushEventResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getHushEventResponse;
+};
 
+export const getGetHushEventQueryKey = (id: string) => {
+  return [`/hush/events/${id}`] as const;
+};
 
-
-
-
-export const getGetHushEventQueryKey = (id: string,) => {
-    return [
-    `/hush/events/${id}`
-    ] as const;
-    }
-
-
-export const getGetHushEventQueryOptions = <TData = Awaited<ReturnType<typeof getHushEvent>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHushEvent>>, TError, TData>>, fetch?: RequestInit}
+export const getGetHushEventQueryOptions = <
+  TData = Awaited<ReturnType<typeof getHushEvent>>,
+  TError = ErrorResponse,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getHushEvent>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
 ) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getGetHushEventQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetHushEventQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getHushEvent>>> = ({
+    signal,
+  }) => getHushEvent(id, { signal, ...fetchOptions });
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: id !== null && id !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getHushEvent>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type GetHushEventQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getHushEvent>>
+>;
+export type GetHushEventQueryError = ErrorResponse;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHushEvent>>> = ({ signal }) => getHushEvent(id, { signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHushEvent>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetHushEventQueryResult = NonNullable<Awaited<ReturnType<typeof getHushEvent>>>
-export type GetHushEventQueryError = ErrorResponse
-
-
-export function useGetHushEvent<TData = Awaited<ReturnType<typeof getHushEvent>>, TError = ErrorResponse>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHushEvent>>, TError, TData>> & Pick<
+export function useGetHushEvent<
+  TData = Awaited<ReturnType<typeof getHushEvent>>,
+  TError = ErrorResponse,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getHushEvent>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getHushEvent>>,
           TError,
           Awaited<ReturnType<typeof getHushEvent>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetHushEvent<TData = Awaited<ReturnType<typeof getHushEvent>>, TError = ErrorResponse>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHushEvent>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetHushEvent<
+  TData = Awaited<ReturnType<typeof getHushEvent>>,
+  TError = ErrorResponse,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getHushEvent>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getHushEvent>>,
           TError,
           Awaited<ReturnType<typeof getHushEvent>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetHushEvent<TData = Awaited<ReturnType<typeof getHushEvent>>, TError = ErrorResponse>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHushEvent>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetHushEvent<
+  TData = Awaited<ReturnType<typeof getHushEvent>>,
+  TError = ErrorResponse,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getHushEvent>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get event detail — public if approved, own-pending for organizer
  */
 
-export function useGetHushEvent<TData = Awaited<ReturnType<typeof getHushEvent>>, TError = ErrorResponse>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHushEvent>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetHushEvent<
+  TData = Awaited<ReturnType<typeof getHushEvent>>,
+  TError = ErrorResponse,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getHushEvent>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetHushEventQueryOptions(id, options);
 
-  const queryOptions = getGetHushEventQueryOptions(id,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
-
-
-
-
-
 export type approveHushEventResponse200 = {
-  data: string
-  status: 200
-}
+  data: string;
+  status: 200;
+};
 
 export type approveHushEventResponse400 = {
-  data: string
-  status: 400
-}
-
-export type approveHushEventResponseSuccess = (approveHushEventResponse200) & {
-  headers: Headers;
-};
-export type approveHushEventResponseError = (approveHushEventResponse400) & {
-  headers: Headers;
+  data: string;
+  status: 400;
 };
 
-export type approveHushEventResponse = (approveHushEventResponseSuccess | approveHushEventResponseError)
+export type approveHushEventResponseSuccess = approveHushEventResponse200 & {
+  headers: Headers;
+};
+export type approveHushEventResponseError = approveHushEventResponse400 & {
+  headers: Headers;
+};
 
-export const getApproveHushEventUrl = (id: string,
-    params: ApproveHushEventParams,) => {
+export type approveHushEventResponse =
+  | approveHushEventResponseSuccess
+  | approveHushEventResponseError;
+
+export const getApproveHushEventUrl = (
+  id: string,
+  params: ApproveHushEventParams,
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
+      normalizedParams.append(key, value === null ? "null" : String(value));
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/hush/events/${id}/approve?${stringifiedParams}` : `/hush/events/${id}/approve`
-}
+  return stringifiedParams.length > 0
+    ? `/hush/events/${id}/approve?${stringifiedParams}`
+    : `/hush/events/${id}/approve`;
+};
 
 /**
  * @summary Approve an event via email token (returns HTML)
  */
-export const approveHushEvent = async (id: string,
-    params: ApproveHushEventParams, options?: RequestInit): Promise<approveHushEventResponse> => {
-
-  const res = await fetch(getApproveHushEventUrl(id,params),
-  {
+export const approveHushEvent = async (
+  id: string,
+  params: ApproveHushEventParams,
+  options?: RequestInit,
+): Promise<approveHushEventResponse> => {
+  const res = await fetch(getApproveHushEventUrl(id, params), {
     ...options,
-    method: 'GET'
-
-
-  }
-)
-
+    method: "GET",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: approveHushEventResponse['data'] = body !== null ? body : ''
-  return { data, status: res.status, headers: res.headers } as approveHushEventResponse
-}
+  const data: approveHushEventResponse["data"] = body !== null ? body : "";
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as approveHushEventResponse;
+};
 
-
-
-
-
-export const getApproveHushEventQueryKey = (id: string,
-    params?: ApproveHushEventParams,) => {
-    return [
-    `/hush/events/${id}/approve`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getApproveHushEventQueryOptions = <TData = Awaited<ReturnType<typeof approveHushEvent>>, TError = string>(id: string,
-    params: ApproveHushEventParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof approveHushEvent>>, TError, TData>>, fetch?: RequestInit}
+export const getApproveHushEventQueryKey = (
+  id: string,
+  params?: ApproveHushEventParams,
 ) => {
+  return [`/hush/events/${id}/approve`, ...(params ? [params] : [])] as const;
+};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+export const getApproveHushEventQueryOptions = <
+  TData = Awaited<ReturnType<typeof approveHushEvent>>,
+  TError = string,
+>(
+  id: string,
+  params: ApproveHushEventParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof approveHushEvent>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+  },
+) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getApproveHushEventQueryKey(id,params);
+  const queryKey =
+    queryOptions?.queryKey ?? getApproveHushEventQueryKey(id, params);
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof approveHushEvent>>
+  > = ({ signal }) => approveHushEvent(id, params, { signal, ...fetchOptions });
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: id !== null && id !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof approveHushEvent>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof approveHushEvent>>> = ({ signal }) => approveHushEvent(id,params, { signal, ...fetchOptions });
+export type ApproveHushEventQueryResult = NonNullable<
+  Awaited<ReturnType<typeof approveHushEvent>>
+>;
+export type ApproveHushEventQueryError = string;
 
-
-
-
-
-   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof approveHushEvent>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ApproveHushEventQueryResult = NonNullable<Awaited<ReturnType<typeof approveHushEvent>>>
-export type ApproveHushEventQueryError = string
-
-
-export function useApproveHushEvent<TData = Awaited<ReturnType<typeof approveHushEvent>>, TError = string>(
- id: string,
-    params: ApproveHushEventParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof approveHushEvent>>, TError, TData>> & Pick<
+export function useApproveHushEvent<
+  TData = Awaited<ReturnType<typeof approveHushEvent>>,
+  TError = string,
+>(
+  id: string,
+  params: ApproveHushEventParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof approveHushEvent>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof approveHushEvent>>,
           TError,
           Awaited<ReturnType<typeof approveHushEvent>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useApproveHushEvent<TData = Awaited<ReturnType<typeof approveHushEvent>>, TError = string>(
- id: string,
-    params: ApproveHushEventParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof approveHushEvent>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useApproveHushEvent<
+  TData = Awaited<ReturnType<typeof approveHushEvent>>,
+  TError = string,
+>(
+  id: string,
+  params: ApproveHushEventParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof approveHushEvent>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof approveHushEvent>>,
           TError,
           Awaited<ReturnType<typeof approveHushEvent>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useApproveHushEvent<TData = Awaited<ReturnType<typeof approveHushEvent>>, TError = string>(
- id: string,
-    params: ApproveHushEventParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof approveHushEvent>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useApproveHushEvent<
+  TData = Awaited<ReturnType<typeof approveHushEvent>>,
+  TError = string,
+>(
+  id: string,
+  params: ApproveHushEventParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof approveHushEvent>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Approve an event via email token (returns HTML)
  */
 
-export function useApproveHushEvent<TData = Awaited<ReturnType<typeof approveHushEvent>>, TError = string>(
- id: string,
-    params: ApproveHushEventParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof approveHushEvent>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useApproveHushEvent<
+  TData = Awaited<ReturnType<typeof approveHushEvent>>,
+  TError = string,
+>(
+  id: string,
+  params: ApproveHushEventParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof approveHushEvent>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getApproveHushEventQueryOptions(id, params, options);
 
-  const queryOptions = getApproveHushEventQueryOptions(id,params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-
-
 
 export type buyTicketResponse201 = {
-  data: BuyTicket201
-  status: 201
-}
+  data: BuyTicket201;
+  status: 201;
+};
 
 export type buyTicketResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
+  data: ErrorResponse;
+  status: 400;
+};
 
 export type buyTicketResponse401 = {
-  data: ErrorResponse
-  status: 401
-}
-
-export type buyTicketResponseSuccess = (buyTicketResponse201) & {
-  headers: Headers;
-};
-export type buyTicketResponseError = (buyTicketResponse400 | buyTicketResponse401) & {
-  headers: Headers;
+  data: ErrorResponse;
+  status: 401;
 };
 
-export type buyTicketResponse = (buyTicketResponseSuccess | buyTicketResponseError)
+export type buyTicketResponseSuccess = buyTicketResponse201 & {
+  headers: Headers;
+};
+export type buyTicketResponseError = (
+  | buyTicketResponse400
+  | buyTicketResponse401
+) & {
+  headers: Headers;
+};
+
+export type buyTicketResponse =
+  | buyTicketResponseSuccess
+  | buyTicketResponseError;
 
 export const getBuyTicketUrl = () => {
-
-
-
-
-  return `/hush/tickets`
-}
+  return `/hush/tickets`;
+};
 
 /**
  * @summary Purchase a ticket for an approved event
  */
-export const buyTicket = async (buyTicketBody: BuyTicketBody, options?: RequestInit): Promise<buyTicketResponse> => {
-
-  const res = await fetch(getBuyTicketUrl(),
-  {
+export const buyTicket = async (
+  buyTicketBody: BuyTicketBody,
+  options?: RequestInit,
+): Promise<buyTicketResponse> => {
+  const res = await fetch(getBuyTicketUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(buyTicketBody)
-  }
-)
-
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(buyTicketBody),
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: buyTicketResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as buyTicketResponse
-}
+  const data: buyTicketResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as buyTicketResponse;
+};
 
+export const getBuyTicketMutationOptions = <
+  TError = ErrorResponse,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof buyTicket>>,
+    TError,
+    { data: BuyTicketBody },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof buyTicket>>,
+  TError,
+  { data: BuyTicketBody },
+  TContext
+> => {
+  const mutationKey = ["buyTicket"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof buyTicket>>,
+    { data: BuyTicketBody }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return buyTicket(data, fetchOptions);
+  };
 
-export const getBuyTicketMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof buyTicket>>, TError,{data: BuyTicketBody}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof buyTicket>>, TError,{data: BuyTicketBody}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['buyTicket'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+export type BuyTicketMutationResult = NonNullable<
+  Awaited<ReturnType<typeof buyTicket>>
+>;
+export type BuyTicketMutationBody = BuyTicketBody;
+export type BuyTicketMutationError = ErrorResponse;
 
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof buyTicket>>, {data: BuyTicketBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  buyTicket(data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type BuyTicketMutationResult = NonNullable<Awaited<ReturnType<typeof buyTicket>>>
-    export type BuyTicketMutationBody = BuyTicketBody
-    export type BuyTicketMutationError = ErrorResponse
-
-    /**
+/**
  * @summary Purchase a ticket for an approved event
  */
-export const useBuyTicket = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof buyTicket>>, TError,{data: BuyTicketBody}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof buyTicket>>,
-        TError,
-        {data: BuyTicketBody},
-        TContext
-      > => {
-      return useMutation(getBuyTicketMutationOptions(options), queryClient);
-    }
-    export type getTicketResponse200 = {
-  data: GetTicket200
-  status: 200
-}
+export const useBuyTicket = <TError = ErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof buyTicket>>,
+      TError,
+      { data: BuyTicketBody },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof buyTicket>>,
+  TError,
+  { data: BuyTicketBody },
+  TContext
+> => {
+  return useMutation(getBuyTicketMutationOptions(options), queryClient);
+};
+export type getTicketResponse200 = {
+  data: GetTicket200;
+  status: 200;
+};
 
 export type getTicketResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type getTicketResponseSuccess = (getTicketResponse200) & {
-  headers: Headers;
-};
-export type getTicketResponseError = (getTicketResponse404) & {
-  headers: Headers;
+  data: ErrorResponse;
+  status: 404;
 };
 
-export type getTicketResponse = (getTicketResponseSuccess | getTicketResponseError)
+export type getTicketResponseSuccess = getTicketResponse200 & {
+  headers: Headers;
+};
+export type getTicketResponseError = getTicketResponse404 & {
+  headers: Headers;
+};
 
-export const getGetTicketUrl = (ref: string,) => {
+export type getTicketResponse =
+  | getTicketResponseSuccess
+  | getTicketResponseError;
 
-
-
-
-  return `/hush/tickets/${ref}`
-}
+export const getGetTicketUrl = (ref: string) => {
+  return `/hush/tickets/${ref}`;
+};
 
 /**
  * @summary Get ticket receipt by reference code
  */
-export const getTicket = async (ref: string, options?: RequestInit): Promise<getTicketResponse> => {
-
-  const res = await fetch(getGetTicketUrl(ref),
-  {
+export const getTicket = async (
+  ref: string,
+  options?: RequestInit,
+): Promise<getTicketResponse> => {
+  const res = await fetch(getGetTicketUrl(ref), {
     ...options,
-    method: 'GET'
-
-
-  }
-)
-
+    method: "GET",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getTicketResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getTicketResponse
-}
+  const data: getTicketResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getTicketResponse;
+};
 
+export const getGetTicketQueryKey = (ref: string) => {
+  return [`/hush/tickets/${ref}`] as const;
+};
 
-
-
-
-export const getGetTicketQueryKey = (ref: string,) => {
-    return [
-    `/hush/tickets/${ref}`
-    ] as const;
-    }
-
-
-export const getGetTicketQueryOptions = <TData = Awaited<ReturnType<typeof getTicket>>, TError = ErrorResponse>(ref: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTicket>>, TError, TData>>, fetch?: RequestInit}
+export const getGetTicketQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTicket>>,
+  TError = ErrorResponse,
+>(
+  ref: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getTicket>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
 ) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getGetTicketQueryKey(ref);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetTicketQueryKey(ref);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getTicket>>> = ({
+    signal,
+  }) => getTicket(ref, { signal, ...fetchOptions });
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: ref !== null && ref !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getTicket>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
+export type GetTicketQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getTicket>>
+>;
+export type GetTicketQueryError = ErrorResponse;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTicket>>> = ({ signal }) => getTicket(ref, { signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: ref !== null && ref !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTicket>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetTicketQueryResult = NonNullable<Awaited<ReturnType<typeof getTicket>>>
-export type GetTicketQueryError = ErrorResponse
-
-
-export function useGetTicket<TData = Awaited<ReturnType<typeof getTicket>>, TError = ErrorResponse>(
- ref: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTicket>>, TError, TData>> & Pick<
+export function useGetTicket<
+  TData = Awaited<ReturnType<typeof getTicket>>,
+  TError = ErrorResponse,
+>(
+  ref: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getTicket>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getTicket>>,
           TError,
           Awaited<ReturnType<typeof getTicket>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTicket<TData = Awaited<ReturnType<typeof getTicket>>, TError = ErrorResponse>(
- ref: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTicket>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetTicket<
+  TData = Awaited<ReturnType<typeof getTicket>>,
+  TError = ErrorResponse,
+>(
+  ref: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getTicket>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getTicket>>,
           TError,
           Awaited<ReturnType<typeof getTicket>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTicket<TData = Awaited<ReturnType<typeof getTicket>>, TError = ErrorResponse>(
- ref: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTicket>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetTicket<
+  TData = Awaited<ReturnType<typeof getTicket>>,
+  TError = ErrorResponse,
+>(
+  ref: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getTicket>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get ticket receipt by reference code
  */
 
-export function useGetTicket<TData = Awaited<ReturnType<typeof getTicket>>, TError = ErrorResponse>(
- ref: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTicket>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetTicket<
+  TData = Awaited<ReturnType<typeof getTicket>>,
+  TError = ErrorResponse,
+>(
+  ref: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getTicket>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetTicketQueryOptions(ref, options);
 
-  const queryOptions = getGetTicketQueryOptions(ref,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-
-
-
