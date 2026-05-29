@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import QRCode from 'qrcode';
-import { usePageTitle } from '@/hooks/usePageTitle';
 import { get } from '@/lib/api';
 import { formatPrice } from '@/components/ListingCard';
 import { Button } from '@/components/ui/button';

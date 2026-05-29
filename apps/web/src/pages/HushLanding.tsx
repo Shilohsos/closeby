@@ -1,7 +1,6 @@
 import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { get } from '@/lib/api';
-import { SEOHead } from '@/components/SEOHead';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { formatPrice } from '@/components/ListingCard';
@@ -27,13 +26,11 @@ export default function HushLanding() {
   const events = data?.data ?? [];
 
   return (
-    <>
-    <SEOHead title="Hush — Campus Events" description="Campus events, parties, and experiences. Get your ticket." />
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
       <SEOHead title="Hush — Campus Events" description="Campus events, parties, and experiences. Get your ticket." />
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center py-16">
-          <h1 className="text-6xl md:text-7xl font-extrabold mb-4 tracking-tight">
+          <h1 className="text-7xl font-extrabold mb-4 tracking-tight">
             <span className="text-accent">Hush</span>
           </h1>
           <p className="text-gray-400 text-xl">Campus events, parties, and experiences. Get your ticket.</p>
@@ -88,6 +85,5 @@ export default function HushLanding() {
         )}
       </div>
     </div>
-    </>
   );
 }

@@ -5,16 +5,24 @@
  * Nigeria's campus marketplace — listings, storefronts, and Hush events
  * OpenAPI spec version: 1.0.0
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
+  QueryClient,
   QueryFunction,
   QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   CreateListing201,
@@ -24,582 +32,549 @@ import type {
   GetListingsParams,
   ListingsPaginated,
   UpdateListing200,
-  UpdateListingBody,
-} from "./closeByAPI.schemas";
+  UpdateListingBody
+} from './closeByAPI.schemas';
+
+
+
+
+
 
 export type getListingsResponse200 = {
-  data: ListingsPaginated;
-  status: 200;
-};
+  data: ListingsPaginated
+  status: 200
+}
 
-export type getListingsResponseSuccess = getListingsResponse200 & {
+export type getListingsResponseSuccess = (getListingsResponse200) & {
   headers: Headers;
 };
-export type getListingsResponse = getListingsResponseSuccess;
+;
 
-export const getGetListingsUrl = (params?: GetListingsParams) => {
+export type getListingsResponse = (getListingsResponseSuccess)
+
+export const getGetListingsUrl = (params?: GetListingsParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
+
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : String(value));
+      normalizedParams.append(key, value === null ? 'null' : String(value))
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0
-    ? `/listings?${stringifiedParams}`
-    : `/listings`;
-};
+  return stringifiedParams.length > 0 ? `/listings?${stringifiedParams}` : `/listings`
+}
 
 /**
  * @summary List listings with optional filters
  */
-export const getListings = async (
-  params?: GetListingsParams,
-  options?: RequestInit,
-): Promise<getListingsResponse> => {
-  const res = await fetch(getGetListingsUrl(params), {
+export const getListings = async (params?: GetListingsParams, options?: RequestInit): Promise<getListingsResponse> => {
+
+  const res = await fetch(getGetListingsUrl(params),
+  {
     ...options,
-    method: "GET",
-  });
+    method: 'GET'
+
+
+  }
+)
+
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getListingsResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as getListingsResponse;
-};
+  const data: getListingsResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getListingsResponse
+}
 
-export const getGetListingsQueryKey = (params?: GetListingsParams) => {
-  return [`/listings`, ...(params ? [params] : [])] as const;
-};
 
-export const getGetListingsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getListings>>,
-  TError = unknown,
->(
-  params?: GetListingsParams,
-  options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<typeof getListings>>,
-      TError,
-      TData
-    >;
-    fetch?: RequestInit;
-  },
+
+
+
+export const getGetListingsQueryKey = (params?: GetListingsParams,) => {
+    return [
+    `/listings`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetListingsQueryOptions = <TData = Awaited<ReturnType<typeof getListings>>, TError = unknown>(params?: GetListingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getListings>>, TError, TData>>, fetch?: RequestInit}
 ) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetListingsQueryKey(params);
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getListings>>> = ({
-    signal,
-  }) => getListings(params, { signal, ...fetchOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetListingsQueryKey(params);
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getListings>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
 
-export type GetListingsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getListings>>
->;
-export type GetListingsQueryError = unknown;
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getListings>>> = ({ signal }) => getListings(params, { signal, ...fetchOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getListings>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetListingsQueryResult = NonNullable<Awaited<ReturnType<typeof getListings>>>
+export type GetListingsQueryError = unknown
+
+
+export function useGetListings<TData = Awaited<ReturnType<typeof getListings>>, TError = unknown>(
+ params: undefined |  GetListingsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getListings>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getListings>>,
+          TError,
+          Awaited<ReturnType<typeof getListings>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetListings<TData = Awaited<ReturnType<typeof getListings>>, TError = unknown>(
+ params?: GetListingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getListings>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getListings>>,
+          TError,
+          Awaited<ReturnType<typeof getListings>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetListings<TData = Awaited<ReturnType<typeof getListings>>, TError = unknown>(
+ params?: GetListingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getListings>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List listings with optional filters
  */
 
-export function useGetListings<
-  TData = Awaited<ReturnType<typeof getListings>>,
-  TError = unknown,
->(
-  params?: GetListingsParams,
-  options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<typeof getListings>>,
-      TError,
-      TData
-    >;
-    fetch?: RequestInit;
-  },
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetListingsQueryOptions(params, options);
+export function useGetListings<TData = Awaited<ReturnType<typeof getListings>>, TError = unknown>(
+ params?: GetListingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getListings>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
+  const queryOptions = getGetListingsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
+
+
 
 export type createListingResponse201 = {
-  data: CreateListing201;
-  status: 201;
-};
+  data: CreateListing201
+  status: 201
+}
 
 export type createListingResponse401 = {
-  data: ErrorResponse;
-  status: 401;
-};
+  data: ErrorResponse
+  status: 401
+}
 
-export type createListingResponseSuccess = createListingResponse201 & {
+export type createListingResponseSuccess = (createListingResponse201) & {
   headers: Headers;
 };
-export type createListingResponseError = createListingResponse401 & {
+export type createListingResponseError = (createListingResponse401) & {
   headers: Headers;
 };
 
-export type createListingResponse =
-  | createListingResponseSuccess
-  | createListingResponseError;
+export type createListingResponse = (createListingResponseSuccess | createListingResponseError)
 
 export const getCreateListingUrl = () => {
-  return `/listings`;
-};
+
+
+
+
+  return `/listings`
+}
 
 /**
  * @summary Create a listing
  */
-export const createListing = async (
-  createListingBody: CreateListingBody,
-  options?: RequestInit,
-): Promise<createListingResponse> => {
-  const res = await fetch(getCreateListingUrl(), {
+export const createListing = async (createListingBody: CreateListingBody, options?: RequestInit): Promise<createListingResponse> => {
+
+  const res = await fetch(getCreateListingUrl(),
+  {
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(createListingBody),
-  });
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createListingBody)
+  }
+)
+
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: createListingResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as createListingResponse;
-};
+  const data: createListingResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as createListingResponse
+}
 
-export const getCreateListingMutationOptions = <
-  TError = ErrorResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createListing>>,
-    TError,
-    { data: CreateListingBody },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createListing>>,
-  TError,
-  { data: CreateListingBody },
-  TContext
-> => {
-  const mutationKey = ["createListing"];
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createListing>>,
-    { data: CreateListingBody }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return createListing(data, fetchOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getCreateListingMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createListing>>, TError,{data: CreateListingBody}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof createListing>>, TError,{data: CreateListingBody}, TContext> => {
 
-export type CreateListingMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createListing>>
->;
-export type CreateListingMutationBody = CreateListingBody;
-export type CreateListingMutationError = ErrorResponse;
+const mutationKey = ['createListing'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
 
-/**
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createListing>>, {data: CreateListingBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createListing(data,fetchOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateListingMutationResult = NonNullable<Awaited<ReturnType<typeof createListing>>>
+    export type CreateListingMutationBody = CreateListingBody
+    export type CreateListingMutationError = ErrorResponse
+
+    /**
  * @summary Create a listing
  */
-export const useCreateListing = <
-  TError = ErrorResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createListing>>,
-    TError,
-    { data: CreateListingBody },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof createListing>>,
-  TError,
-  { data: CreateListingBody },
-  TContext
-> => {
-  return useMutation(getCreateListingMutationOptions(options));
-};
-export type getListingResponse200 = {
-  data: GetListing200;
-  status: 200;
-};
+export const useCreateListing = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createListing>>, TError,{data: CreateListingBody}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createListing>>,
+        TError,
+        {data: CreateListingBody},
+        TContext
+      > => {
+      return useMutation(getCreateListingMutationOptions(options), queryClient);
+    }
+    export type getListingResponse200 = {
+  data: GetListing200
+  status: 200
+}
 
 export type getListingResponse404 = {
-  data: ErrorResponse;
-  status: 404;
-};
+  data: ErrorResponse
+  status: 404
+}
 
-export type getListingResponseSuccess = getListingResponse200 & {
+export type getListingResponseSuccess = (getListingResponse200) & {
   headers: Headers;
 };
-export type getListingResponseError = getListingResponse404 & {
+export type getListingResponseError = (getListingResponse404) & {
   headers: Headers;
 };
 
-export type getListingResponse =
-  | getListingResponseSuccess
-  | getListingResponseError;
+export type getListingResponse = (getListingResponseSuccess | getListingResponseError)
 
-export const getGetListingUrl = (id: string) => {
-  return `/listings/${id}`;
-};
+export const getGetListingUrl = (id: string,) => {
+
+
+
+
+  return `/listings/${id}`
+}
 
 /**
  * @summary Get a listing with seller info
  */
-export const getListing = async (
-  id: string,
-  options?: RequestInit,
-): Promise<getListingResponse> => {
-  const res = await fetch(getGetListingUrl(id), {
+export const getListing = async (id: string, options?: RequestInit): Promise<getListingResponse> => {
+
+  const res = await fetch(getGetListingUrl(id),
+  {
     ...options,
-    method: "GET",
-  });
+    method: 'GET'
+
+
+  }
+)
+
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getListingResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as getListingResponse;
-};
+  const data: getListingResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getListingResponse
+}
 
-export const getGetListingQueryKey = (id: string) => {
-  return [`/listings/${id}`] as const;
-};
 
-export const getGetListingQueryOptions = <
-  TData = Awaited<ReturnType<typeof getListing>>,
-  TError = ErrorResponse,
->(
-  id: string,
-  options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<typeof getListing>>,
-      TError,
-      TData
-    >;
-    fetch?: RequestInit;
-  },
+
+
+
+export const getGetListingQueryKey = (id: string,) => {
+    return [
+    `/listings/${id}`
+    ] as const;
+    }
+
+
+export const getGetListingQueryOptions = <TData = Awaited<ReturnType<typeof getListing>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getListing>>, TError, TData>>, fetch?: RequestInit}
 ) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetListingQueryKey(id);
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getListing>>> = ({
-    signal,
-  }) => getListing(id, { signal, ...fetchOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetListingQueryKey(id);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: id !== null && id !== undefined,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getListing>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
 
-export type GetListingQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getListing>>
->;
-export type GetListingQueryError = ErrorResponse;
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getListing>>> = ({ signal }) => getListing(id, { signal, ...fetchOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getListing>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetListingQueryResult = NonNullable<Awaited<ReturnType<typeof getListing>>>
+export type GetListingQueryError = ErrorResponse
+
+
+export function useGetListing<TData = Awaited<ReturnType<typeof getListing>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getListing>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getListing>>,
+          TError,
+          Awaited<ReturnType<typeof getListing>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetListing<TData = Awaited<ReturnType<typeof getListing>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getListing>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getListing>>,
+          TError,
+          Awaited<ReturnType<typeof getListing>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetListing<TData = Awaited<ReturnType<typeof getListing>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getListing>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get a listing with seller info
  */
 
-export function useGetListing<
-  TData = Awaited<ReturnType<typeof getListing>>,
-  TError = ErrorResponse,
->(
-  id: string,
-  options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<typeof getListing>>,
-      TError,
-      TData
-    >;
-    fetch?: RequestInit;
-  },
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetListingQueryOptions(id, options);
+export function useGetListing<TData = Awaited<ReturnType<typeof getListing>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getListing>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
+  const queryOptions = getGetListingQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
+
+
+
+
+
 export type updateListingResponse200 = {
-  data: UpdateListing200;
-  status: 200;
-};
+  data: UpdateListing200
+  status: 200
+}
 
 export type updateListingResponse403 = {
-  data: ErrorResponse;
-  status: 403;
-};
+  data: ErrorResponse
+  status: 403
+}
 
-export type updateListingResponseSuccess = updateListingResponse200 & {
+export type updateListingResponseSuccess = (updateListingResponse200) & {
   headers: Headers;
 };
-export type updateListingResponseError = updateListingResponse403 & {
+export type updateListingResponseError = (updateListingResponse403) & {
   headers: Headers;
 };
 
-export type updateListingResponse =
-  | updateListingResponseSuccess
-  | updateListingResponseError;
+export type updateListingResponse = (updateListingResponseSuccess | updateListingResponseError)
 
-export const getUpdateListingUrl = (id: string) => {
-  return `/listings/${id}`;
-};
+export const getUpdateListingUrl = (id: string,) => {
+
+
+
+
+  return `/listings/${id}`
+}
 
 /**
  * @summary Update a listing (owner only)
  */
-export const updateListing = async (
-  id: string,
-  updateListingBody: UpdateListingBody,
-  options?: RequestInit,
-): Promise<updateListingResponse> => {
-  const res = await fetch(getUpdateListingUrl(id), {
+export const updateListing = async (id: string,
+    updateListingBody: UpdateListingBody, options?: RequestInit): Promise<updateListingResponse> => {
+
+  const res = await fetch(getUpdateListingUrl(id),
+  {
     ...options,
-    method: "PATCH",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(updateListingBody),
-  });
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateListingBody)
+  }
+)
+
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: updateListingResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as updateListingResponse;
-};
+  const data: updateListingResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as updateListingResponse
+}
 
-export const getUpdateListingMutationOptions = <
-  TError = ErrorResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateListing>>,
-    TError,
-    { id: string; data: UpdateListingBody },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateListing>>,
-  TError,
-  { id: string; data: UpdateListingBody },
-  TContext
-> => {
-  const mutationKey = ["updateListing"];
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateListing>>,
-    { id: string; data: UpdateListingBody }
-  > = (props) => {
-    const { id, data } = props ?? {};
 
-    return updateListing(id, data, fetchOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getUpdateListingMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateListing>>, TError,{id: string;data: UpdateListingBody}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof updateListing>>, TError,{id: string;data: UpdateListingBody}, TContext> => {
 
-export type UpdateListingMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateListing>>
->;
-export type UpdateListingMutationBody = UpdateListingBody;
-export type UpdateListingMutationError = ErrorResponse;
+const mutationKey = ['updateListing'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
 
-/**
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateListing>>, {id: string;data: UpdateListingBody}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateListing(id,data,fetchOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateListingMutationResult = NonNullable<Awaited<ReturnType<typeof updateListing>>>
+    export type UpdateListingMutationBody = UpdateListingBody
+    export type UpdateListingMutationError = ErrorResponse
+
+    /**
  * @summary Update a listing (owner only)
  */
-export const useUpdateListing = <
-  TError = ErrorResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateListing>>,
-    TError,
-    { id: string; data: UpdateListingBody },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof updateListing>>,
-  TError,
-  { id: string; data: UpdateListingBody },
-  TContext
-> => {
-  return useMutation(getUpdateListingMutationOptions(options));
-};
-export type deleteListingResponse204 = {
-  data: void;
-  status: 204;
-};
+export const useUpdateListing = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateListing>>, TError,{id: string;data: UpdateListingBody}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateListing>>,
+        TError,
+        {id: string;data: UpdateListingBody},
+        TContext
+      > => {
+      return useMutation(getUpdateListingMutationOptions(options), queryClient);
+    }
+    export type deleteListingResponse204 = {
+  data: void
+  status: 204
+}
 
 export type deleteListingResponse403 = {
-  data: ErrorResponse;
-  status: 403;
-};
+  data: ErrorResponse
+  status: 403
+}
 
-export type deleteListingResponseSuccess = deleteListingResponse204 & {
+export type deleteListingResponseSuccess = (deleteListingResponse204) & {
   headers: Headers;
 };
-export type deleteListingResponseError = deleteListingResponse403 & {
+export type deleteListingResponseError = (deleteListingResponse403) & {
   headers: Headers;
 };
 
-export type deleteListingResponse =
-  | deleteListingResponseSuccess
-  | deleteListingResponseError;
+export type deleteListingResponse = (deleteListingResponseSuccess | deleteListingResponseError)
 
-export const getDeleteListingUrl = (id: string) => {
-  return `/listings/${id}`;
-};
+export const getDeleteListingUrl = (id: string,) => {
+
+
+
+
+  return `/listings/${id}`
+}
 
 /**
  * @summary Delete a listing (owner only)
  */
-export const deleteListing = async (
-  id: string,
-  options?: RequestInit,
-): Promise<deleteListingResponse> => {
-  const res = await fetch(getDeleteListingUrl(id), {
+export const deleteListing = async (id: string, options?: RequestInit): Promise<deleteListingResponse> => {
+
+  const res = await fetch(getDeleteListingUrl(id),
+  {
     ...options,
-    method: "DELETE",
-  });
+    method: 'DELETE'
+
+
+  }
+)
+
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: deleteListingResponse["data"] = body
-    ? JSON.parse(body)
-    : undefined;
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as deleteListingResponse;
-};
+  const data: deleteListingResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as deleteListingResponse
+}
 
-export const getDeleteListingMutationOptions = <
-  TError = ErrorResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteListing>>,
-    TError,
-    { id: string },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteListing>>,
-  TError,
-  { id: string },
-  TContext
-> => {
-  const mutationKey = ["deleteListing"];
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteListing>>,
-    { id: string }
-  > = (props) => {
-    const { id } = props ?? {};
 
-    return deleteListing(id, fetchOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getDeleteListingMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteListing>>, TError,{id: string}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteListing>>, TError,{id: string}, TContext> => {
 
-export type DeleteListingMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteListing>>
->;
+const mutationKey = ['deleteListing'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
 
-export type DeleteListingMutationError = ErrorResponse;
 
-/**
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteListing>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteListing(id,fetchOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteListingMutationResult = NonNullable<Awaited<ReturnType<typeof deleteListing>>>
+
+    export type DeleteListingMutationError = ErrorResponse
+
+    /**
  * @summary Delete a listing (owner only)
  */
-export const useDeleteListing = <
-  TError = ErrorResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteListing>>,
-    TError,
-    { id: string },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof deleteListing>>,
-  TError,
-  { id: string },
-  TContext
-> => {
-  return useMutation(getDeleteListingMutationOptions(options));
-};
+export const useDeleteListing = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteListing>>, TError,{id: string}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteListing>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getDeleteListingMutationOptions(options), queryClient);
+    }

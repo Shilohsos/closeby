@@ -4,8 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { authPost } from '@/lib/api';
-import { usePageTitle } from '@/hooks/usePageTitle';
-import { useToast } from '@/providers/ToastProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';

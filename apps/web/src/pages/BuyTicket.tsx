@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation, Link } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
 import { authGet, authPost } from '@/lib/api';
-import { usePageTitle } from '@/hooks/usePageTitle';
-import { useToast } from '@/providers/ToastProvider';
 import { formatPrice } from '@/components/ListingCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

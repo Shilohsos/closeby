@@ -3,7 +3,6 @@ import { useParams, useLocation, Link } from 'wouter';
 import { useAuth } from '@/hooks/useAuth';
 import { authGet } from '@/lib/api';
 import { formatPrice } from '@/components/ListingCard';
-import { SEOHead } from '@/components/SEOHead';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -72,12 +71,6 @@ export default function EventDetail() {
   const spotsLeft = event.capacity - event.soldTickets;
 
   return (
-    <>
-    <SEOHead
-      title={event.title}
-      description={event.description ?? `${event.location} · ${formatPrice(event.ticketPrice)}`}
-      image={event.flyerUrl ?? undefined}
-    />
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
       <SEOHead title={event.title} description={event.description ?? undefined} image={event.flyerUrl ?? undefined} />
       {isOrganizer && event.status === 'pending' && (
@@ -130,6 +123,5 @@ export default function EventDetail() {
         <Button size="lg" disabled className="w-full sm:w-auto">Sold Out</Button>
       )}
     </div>
-    </>
   );
 }

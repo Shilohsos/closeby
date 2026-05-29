@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useLocation, Link } from 'wouter';
-import { usePageTitle } from '@/hooks/usePageTitle';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';

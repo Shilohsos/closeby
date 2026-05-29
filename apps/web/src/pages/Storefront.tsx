@@ -1,6 +1,5 @@
 import { useParams, Link } from 'wouter';
 import { useStorefront } from '@/hooks/useStorefront';
-import { usePageTitle } from '@/hooks/usePageTitle';
 import { ListingCard, ListingCardSkeleton } from '@/components/ListingCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,6 @@ export default function Storefront() {
   usePageTitle('Storefront');
   const { userId } = useParams<{ userId: string }>();
   const { data, isLoading, isError } = useStorefront(userId);
-  usePageTitle(data?.data?.bio?.split('\n')[0] ?? 'Storefront');
 
   if (isLoading) {
     return (

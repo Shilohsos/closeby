@@ -6,8 +6,6 @@ import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import { useListings, useDeleteListing } from '@/hooks/useListings';
 import { useStorefront, useUpdateStorefront } from '@/hooks/useStorefront';
-import { usePageTitle } from '@/hooks/usePageTitle';
-import { useToast } from '@/providers/ToastProvider';
 import { formatPrice, CATEGORY_LABELS } from '@/components/ListingCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -73,7 +71,7 @@ export default function Profile() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="flex items-center gap-4 mb-8">
-        <div className="w-14 h-14 rounded-full bg-secondary overflow-hidden flex items-center justify-center text-2xl flex-shrink-0">
+        <div className="w-14 h-14 rounded-full bg-secondary overflow-hidden flex items-center justify-center text-2xl">
           {storefrontData?.data?.avatarUrl
             ? <img src={storefrontData.data.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
             : '👤'

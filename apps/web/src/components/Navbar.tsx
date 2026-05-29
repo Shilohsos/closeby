@@ -74,34 +74,9 @@ export default function Navbar() {
   const [, navigate] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const role = profile?.role;
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   const { data: sfData } = useStorefront(user?.id ?? '');
   const avatarUrl = sfData?.data?.avatarUrl;
-
-  function closeMobile() {
-    setMobileOpen(false);
-  }
-
-  const navLinks = (
-    <>
-      <Link href="/browse" onClick={closeMobile} className={`hover:text-accent transition ${location === '/browse' ? 'text-accent' : ''}`}>Browse</Link>
-      <Link href="/hush" onClick={closeMobile} className={`hover:text-accent transition ${location.startsWith('/hush') ? 'text-accent' : ''}`}>Hush</Link>
-      {!user && (
-        <Link href="/signin" onClick={closeMobile} className="hover:text-accent transition">Sign In</Link>
-      )}
-      {user && role === 'seller' && (
-        <Link href="/create" onClick={closeMobile} className="bg-primary hover:bg-green-700 px-4 py-2 rounded-lg transition text-white font-medium text-sm">
-          Post Listing
-        </Link>
-      )}
-      {user && role === 'organizer' && (
-        <Link href="/hush/post" onClick={closeMobile} className="bg-primary hover:bg-green-700 px-4 py-2 rounded-lg transition text-white font-medium text-sm">
-          Post Event
-        </Link>
-      )}
-    </>
-  );
 
   return (
     <>

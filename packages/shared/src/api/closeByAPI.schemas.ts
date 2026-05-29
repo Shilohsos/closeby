@@ -9,17 +9,17 @@ export interface ErrorResponse {
   error: string;
 }
 
-export type ListingCategory =
-  (typeof ListingCategory)[keyof typeof ListingCategory];
+export type ListingCategory = typeof ListingCategory[keyof typeof ListingCategory];
+
 
 export const ListingCategory = {
-  housing: "housing",
-  jobs: "jobs",
-  services: "services",
-  food_restaurants: "food_restaurants",
-  electronics: "electronics",
-  fashion: "fashion",
-  events: "events",
+  housing: 'housing',
+  jobs: 'jobs',
+  services: 'services',
+  food_restaurants: 'food_restaurants',
+  electronics: 'electronics',
+  fashion: 'fashion',
+  events: 'events',
 } as const;
 
 export interface SellerInfo {
@@ -52,12 +52,12 @@ export interface Storefront {
   socialLinks?: string[];
 }
 
-export type HushEventStatus =
-  (typeof HushEventStatus)[keyof typeof HushEventStatus];
+export type HushEventStatus = typeof HushEventStatus[keyof typeof HushEventStatus];
+
 
 export const HushEventStatus = {
-  pending: "pending",
-  approved: "approved",
+  pending: 'pending',
+  approved: 'approved',
 } as const;
 
 export interface HushEvent {
@@ -123,27 +123,27 @@ export type GetStats200 = {
 };
 
 export type GetListingsParams = {
-  q?: string;
-  category?: string;
-  location?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  userId?: string;
-  page?: number;
-  limit?: number;
+q?: string;
+category?: string;
+location?: string;
+minPrice?: number;
+maxPrice?: number;
+userId?: string;
+page?: number;
+limit?: number;
 };
 
-export type CreateListingBodyCategory =
-  (typeof CreateListingBodyCategory)[keyof typeof CreateListingBodyCategory];
+export type CreateListingBodyCategory = typeof CreateListingBodyCategory[keyof typeof CreateListingBodyCategory];
+
 
 export const CreateListingBodyCategory = {
-  housing: "housing",
-  jobs: "jobs",
-  services: "services",
-  food_restaurants: "food_restaurants",
-  electronics: "electronics",
-  fashion: "fashion",
-  events: "events",
+  housing: 'housing',
+  jobs: 'jobs',
+  services: 'services',
+  food_restaurants: 'food_restaurants',
+  electronics: 'electronics',
+  fashion: 'fashion',
+  events: 'events',
 } as const;
 
 export type CreateListingBody = {
@@ -164,17 +164,17 @@ export type GetListing200 = {
   data?: Listing;
 };
 
-export type UpdateListingBodyCategory =
-  (typeof UpdateListingBodyCategory)[keyof typeof UpdateListingBodyCategory];
+export type UpdateListingBodyCategory = typeof UpdateListingBodyCategory[keyof typeof UpdateListingBodyCategory];
+
 
 export const UpdateListingBodyCategory = {
-  housing: "housing",
-  jobs: "jobs",
-  services: "services",
-  food_restaurants: "food_restaurants",
-  electronics: "electronics",
-  fashion: "fashion",
-  events: "events",
+  housing: 'housing',
+  jobs: 'jobs',
+  services: 'services',
+  food_restaurants: 'food_restaurants',
+  electronics: 'electronics',
+  fashion: 'fashion',
+  events: 'events',
 } as const;
 
 export type UpdateListingBody = {
@@ -233,7 +233,7 @@ export type GetHushEvent200 = {
 };
 
 export type ApproveHushEventParams = {
-  token: string;
+token: string;
 };
 
 export type BuyTicketBody = {
@@ -248,3 +248,4 @@ export type BuyTicket201 = {
 export type GetTicket200 = {
   data?: Ticket;
 };
+

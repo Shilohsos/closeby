@@ -1,7 +1,6 @@
 import { useParams, Link } from 'wouter';
 import { useListing } from '@/hooks/useListings';
 import { formatPrice, CATEGORY_LABELS } from '@/components/ListingCard';
-import { SEOHead } from '@/components/SEOHead';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -40,13 +39,6 @@ export default function ListingDetail() {
   const seller = listing.seller;
 
   return (
-    <>
-    <SEOHead
-      title={listing.title}
-      description={listing.description ?? `${CATEGORY_LABELS[listing.category]} · ${listing.location} · ${formatPrice(listing.price)}`}
-      image={listing.imageUrl ?? undefined}
-      url={window.location.href}
-    />
     <div className="max-w-4xl mx-auto px-4 py-8">
       <SEOHead title={`Listing: ${listing.title}`} description={listing.description ?? undefined} image={listing.imageUrl ?? undefined} />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -102,6 +94,5 @@ export default function ListingDetail() {
         </aside>
       </div>
     </div>
-    </>
   );
 }
