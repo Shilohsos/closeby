@@ -5,6 +5,8 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { SEOHead } from '@/components/SEOHead';
 import { ListingCard, ListingCardSkeleton } from '@/components/ListingCard';
 import { Button } from '@/components/ui/button';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { SEOHead } from '@/components/SEOHead';
 
 const CATEGORIES = [
   { slug: 'housing', label: 'Housing', icon: '🏠' },
@@ -22,61 +24,38 @@ export default function Home() {
   const { data: stats, isError: statsError } = useStats();
 
   return (
-    <>
-      <SEOHead
-        title="Campus Marketplace"
-        description="Nigeria's campus marketplace — buy, sell, and connect with students near you."
-      />
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Hero */}
-        <section className="text-center py-16 md:py-20">
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
-            Welcome to <span className="text-primary">Close By</span>
-          </h1>
-          <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
-            Nigeria's campus marketplace — buy, sell, and connect with students near you.
-          </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Link href="/browse">
-              <Button size="lg">Browse Listings</Button>
-            </Link>
-            <Link href="/create">
-              <Button size="lg" variant="outline">Post an Item</Button>
-            </Link>
-          </div>
+    <div className="max-w-7xl mx-auto px-4">
+      <SEOHead title="Campus Marketplace" description="Nigeria's campus marketplace — buy, sell, and connect with students near you." />
+      {/* Hero */}
+      <section className="text-center py-20">
+        <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
+          Welcome to <span className="text-primary">Close By</span>
+        </h1>
+        <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
+          Nigeria's campus marketplace — buy, sell, and connect with students near you.
+        </p>
+        <div className="flex gap-4 justify-center flex-wrap">
+          <Link href="/browse">
+            <Button size="lg">Browse Listings</Button>
+          </Link>
+          <Link href="/create">
+            <Button size="lg" variant="outline">Post an Item</Button>
+          </Link>
+        </div>
 
-          {!statsError && stats && (
-            <div className="flex gap-8 md:gap-12 justify-center mt-12">
-              {[
-                { value: stats.totalListings, label: 'Listings' },
-                { value: stats.activeSellers, label: 'Sellers' },
-                { value: stats.supportedLocations, label: 'Universities' },
-              ].map(({ value, label }) => (
-                <div key={label} className="text-center">
-                  <div className="text-3xl font-bold text-primary">{value}</div>
-                  <div className="text-sm text-muted-foreground mt-1">{label}</div>
-                </div>
-              ))}
-            </div>
-          )}
-          {statsError && (
-            <p className="text-xs text-muted-foreground mt-8">Could not load stats.</p>
-          )}
-        </section>
-
-        {/* Categories */}
-        <section className="py-8 md:py-12">
-          <h2 className="text-2xl font-bold mb-6">Browse by Category</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {CATEGORIES.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/browse?category=${cat.slug}`}
-                className="bg-card hover:bg-secondary border border-border hover:border-primary/50 rounded-xl p-4 md:p-6 text-center transition-colors group"
-              >
-                <div className="text-3xl md:text-4xl mb-2 md:mb-3">{cat.icon}</div>
-                <div className="font-medium text-sm group-hover:text-primary transition-colors">{cat.label}</div>
-              </Link>
+        {statsError ? (
+          <p className="text-sm text-muted-foreground mt-8">Could not load stats.</p>
+        ) : stats && (
+          <div className="flex gap-12 justify-center mt-12">
+            {[
+              { value: stats.totalListings, label: 'Listings' },
+              { value: stats.activeSellers, label: 'Sellers' },
+              { value: stats.supportedLocations, label: 'Universities' },
+            ].map(({ value, label }) => (
+              <div key={label} className="text-center">
+                <div className="text-3xl font-bold text-primary">{value}</div>
+                <div className="text-sm text-muted-foreground mt-1">{label}</div>
+              </div>
             ))}
           </div>
         </section>
@@ -89,6 +68,23 @@ export default function Home() {
               View all →
             </Link>
           </div>
+        ) : isError ? (
+          <div className="text-center py-16 space-y-3">
+            <p className="text-muted-foreground">Could not load listings.</p>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>Retry</Button>
+          </div>
+        ) : !featured?.data.length ? (
+          <div className="text-center py-16 text-muted-foreground">
+            <div className="text-5xl mb-4">📦</div>
+            <p className="font-medium">No listings yet — be the first to post!</p>
+            <Link href="/create"><Button className="mt-4">Post a Listing</Button></Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featured.data.map((l) => <ListingCard key={l.id} listing={l} />)}
+          </div>
+        )}
+      </section>
 
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

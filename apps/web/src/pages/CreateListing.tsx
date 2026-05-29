@@ -12,6 +12,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { useToast } from '@/providers/ToastProvider';
 
 const CATEGORIES = [
   { value: 'housing', label: 'Housing' },
@@ -42,13 +44,13 @@ type FormValues = z.infer<typeof schema>;
 
 export default function CreateListing() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const search = useSearch();
   const editId = new URLSearchParams(search).get('edit');
   const isEdit = !!editId;
   usePageTitle(isEdit ? 'Edit Listing' : 'Post a Listing');
 
-  const { toast } = useToast();
-  const { data: existingData, isLoading: editLoading } = useListing(editId ?? '');
+  const { data: existingData, isLoading: existingLoading } = useListing(editId ?? '');
   const createMutation = useCreateListing();
   const updateMutation = useUpdateListing(editId ?? '');
 
@@ -87,22 +89,18 @@ export default function CreateListing() {
   const isPending = createMutation.isPending || updateMutation.isPending;
   const error = createMutation.error || updateMutation.error;
 
-  if (isEdit && editLoading) {
+  if (isEdit && existingLoading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <Card>
-          <CardHeader><Skeleton className="h-7 w-40" /></CardHeader>
-          <CardContent className="space-y-5">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-24 w-full" />
-            <div className="grid grid-cols-2 gap-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </CardContent>
-        </Card>
+      <div className="max-w-2xl mx-auto px-4 py-8 space-y-4">
+        <Skeleton className="h-8 w-1/3" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <div className="grid grid-cols-2 gap-4">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
       </div>
     );
   }

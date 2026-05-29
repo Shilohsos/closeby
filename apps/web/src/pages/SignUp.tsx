@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription,
 } from '@/components/ui/form';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),

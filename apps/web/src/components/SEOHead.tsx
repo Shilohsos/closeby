@@ -1,26 +1,25 @@
 import { useEffect } from 'react';
 
-interface SEOHeadProps {
+type Props = {
   title: string;
   description?: string;
   image?: string;
   url?: string;
-}
+};
 
-export function SEOHead({ title, description, image, url }: SEOHeadProps) {
+export function SEOHead({ title, description, image, url }: Props) {
   useEffect(() => {
     const fullTitle = `Close By — ${title}`;
-    document.title = fullTitle;
-
     const tags: [string, string][] = [
       ['og:title', fullTitle],
-      ['og:description', description ?? "Nigeria's campus marketplace — buy, sell, and connect with students."],
+      ['og:description', description ?? "Nigeria's campus marketplace"],
       ['og:image', image ?? '/og-default.png'],
       ['og:url', url ?? window.location.href],
       ['og:type', 'website'],
       ['twitter:card', 'summary_large_image'],
       ['twitter:title', fullTitle],
       ['twitter:description', description ?? "Nigeria's campus marketplace"],
+      ['twitter:image', image ?? '/og-default.png'],
     ];
 
     tags.forEach(([property, content]) => {

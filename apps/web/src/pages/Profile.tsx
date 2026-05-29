@@ -17,6 +17,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { useToast } from '@/providers/ToastProvider';
 
 const sfSchema = z.object({
   bio: z.string().max(500).optional(),
@@ -49,9 +51,23 @@ export default function Profile() {
   async function handleDelete(id: string) {
     if (!confirm('Delete this listing?')) return;
     setDeleteId(id);
-    await deleteMutation.mutateAsync(id);
-    setDeleteId(null);
-    toast({ title: 'Listing deleted', variant: 'default' });
+    try {
+      await deleteMutation.mutateAsync(id);
+      toast({ title: 'Listing deleted', variant: 'success' });
+    } catch {
+      toast({ title: 'Failed to delete listing', variant: 'destructive' });
+    } finally {
+      setDeleteId(null);
+    }
+  }
+
+  async function handleStorefrontSave(v: SFValues) {
+    try {
+      await updateSf.mutateAsync({ ...v, avatarUrl: v.avatarUrl || null });
+      toast({ title: 'Storefront saved', variant: 'success' });
+    } catch {
+      toast({ title: 'Failed to save storefront', variant: 'destructive' });
+    }
   }
 
   return (
@@ -81,7 +97,7 @@ export default function Profile() {
             <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}</div>
           ) : listingsError ? (
             <div className="text-center py-12 space-y-3">
-              <p className="text-muted-foreground">Could not load your listings.</p>
+              <p className="text-muted-foreground">Failed to load listings.</p>
               <Button variant="outline" size="sm" onClick={() => refetchListings()}>Retry</Button>
             </div>
           ) : !listingsData?.data.length ? (
@@ -126,13 +142,7 @@ export default function Profile() {
             <div className="space-y-4"><Skeleton className="h-10 w-full" /><Skeleton className="h-24 w-full" /><Skeleton className="h-10 w-full" /></div>
           ) : (
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(async (v) => {
-                  await updateSf.mutateAsync({ ...v, avatarUrl: v.avatarUrl || null });
-                  toast({ title: 'Storefront saved', variant: 'success' });
-                })}
-                className="space-y-5 max-w-lg"
-              >
+              <form onSubmit={form.handleSubmit(handleStorefrontSave)} className="space-y-5 max-w-lg">
                 <FormField control={form.control} name="avatarUrl" render={({ field }) => (
                   <FormItem><FormLabel>Avatar URL</FormLabel><FormControl><Input type="url" placeholder="https://…" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />

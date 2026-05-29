@@ -7,6 +7,8 @@ import { SEOHead } from '@/components/SEOHead';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { SEOHead } from '@/components/SEOHead';
 
 type HushEvent = {
   id: string;
@@ -33,6 +35,8 @@ export default function EventDetail() {
   const [event, setEvent] = useState<HushEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  usePageTitle(event ? event.title : 'Event');
+
 
   useEffect(() => {
     setLoading(true);
@@ -75,6 +79,7 @@ export default function EventDetail() {
       image={event.flyerUrl ?? undefined}
     />
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+      <SEOHead title={event.title} description={event.description ?? undefined} image={event.flyerUrl ?? undefined} />
       {isOrganizer && event.status === 'pending' && (
         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg px-4 py-3 flex items-center gap-2">
           <span>⏳</span>

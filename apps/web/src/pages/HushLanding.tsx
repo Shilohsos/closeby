@@ -5,6 +5,8 @@ import { SEOHead } from '@/components/SEOHead';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { formatPrice } from '@/components/ListingCard';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { SEOHead } from '@/components/SEOHead';
 
 type HushEvent = {
   id: string;
@@ -16,6 +18,7 @@ type HushEvent = {
 };
 
 export default function HushLanding() {
+  usePageTitle('Hush — Campus Events');
   const { data, isLoading, isError, refetch } = useQuery<{ data: HushEvent[] }>({
     queryKey: ['hush-events'],
     queryFn: () => get('/hush/events'),
@@ -27,6 +30,7 @@ export default function HushLanding() {
     <>
     <SEOHead title="Hush — Campus Events" description="Campus events, parties, and experiences. Get your ticket." />
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
+      <SEOHead title="Hush — Campus Events" description="Campus events, parties, and experiences. Get your ticket." />
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center py-16">
           <h1 className="text-6xl md:text-7xl font-extrabold mb-4 tracking-tight">

@@ -11,6 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { useToast } from '@/providers/ToastProvider';
 
 const schema = z.object({
   title: z.string().min(3, 'Event name must be at least 3 characters').max(200),
@@ -53,7 +55,7 @@ export default function PostEvent() {
         paymentProofUrl: values.paymentProofUrl || undefined,
       }),
     onSuccess: () => {
-      toast({ title: 'Event submitted for review!', variant: 'success' });
+      toast({ title: 'Event submitted for review!', description: 'We will notify you once it is approved.', variant: 'success' });
       navigate('/hush');
     },
   });

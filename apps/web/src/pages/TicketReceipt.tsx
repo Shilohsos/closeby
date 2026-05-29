@@ -6,6 +6,8 @@ import { get } from '@/lib/api';
 import { formatPrice } from '@/components/ListingCard';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { SEOHead } from '@/components/SEOHead';
 
 type TicketData = {
   ticket: {
@@ -68,6 +70,7 @@ export default function TicketReceipt() {
 
   return (
     <>
+      <SEOHead title="Ticket Receipt" description={`Ticket for ${event.title}`} image={event.flyerUrl ?? undefined} />
       <style>{`
         @media print {
           body { background: white !important; color: black !important; }

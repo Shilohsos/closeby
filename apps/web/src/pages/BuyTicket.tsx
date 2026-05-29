@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { useToast } from '@/providers/ToastProvider';
 
 type HushEvent = {
   id: string;
@@ -62,7 +64,7 @@ export default function BuyTicket() {
         eventId: event.id,
         buyerName: buyerName.trim(),
       });
-      toast({ title: 'Ticket issued!', variant: 'success' });
+      toast({ title: 'Ticket issued!', description: 'Your ticket is ready.', variant: 'success' });
       navigate(`/hush/ticket/${referenceCode}`);
     } catch (e) {
       setError((e as Error).message);

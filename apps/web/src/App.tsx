@@ -22,7 +22,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-950">
       <Navbar />
-      <main className="pt-16">
+      <main className="pt-16 pb-16 md:pb-0">
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/browse" component={Browse} />

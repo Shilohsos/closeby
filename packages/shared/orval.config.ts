@@ -8,5 +8,8 @@ export default defineConfig({
       client: 'react-query',
       mode: 'tags',
     },
+    hooks: {
+      afterAllFilesWrite: 'prettier --write',
+    },
   },
 });
