@@ -4,10 +4,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useCreateListing, useListing, useUpdateListing } from '@/hooks/useListings';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { useToast } from '@/providers/ToastProvider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 const CATEGORIES = [
@@ -42,8 +45,10 @@ export default function CreateListing() {
   const search = useSearch();
   const editId = new URLSearchParams(search).get('edit');
   const isEdit = !!editId;
+  usePageTitle(isEdit ? 'Edit Listing' : 'Post a Listing');
 
-  const { data: existingData } = useListing(editId ?? '');
+  const { toast } = useToast();
+  const { data: existingData, isLoading: editLoading } = useListing(editId ?? '');
   const createMutation = useCreateListing();
   const updateMutation = useUpdateListing(editId ?? '');
 
@@ -70,15 +75,37 @@ export default function CreateListing() {
     const payload = { ...values, price: Math.round(values.price * 100), imageUrl: values.imageUrl || null };
     if (isEdit) {
       const res = await updateMutation.mutateAsync(payload);
+      toast({ title: 'Listing updated!', variant: 'success' });
       setLocation(`/listing/${res.data.id}`);
     } else {
       const res = await createMutation.mutateAsync(payload);
+      toast({ title: 'Listing posted!', variant: 'success' });
       setLocation(`/listing/${res.data.id}`);
     }
   }
 
   const isPending = createMutation.isPending || updateMutation.isPending;
   const error = createMutation.error || updateMutation.error;
+
+  if (isEdit && editLoading) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <Card>
+          <CardHeader><Skeleton className="h-7 w-40" /></CardHeader>
+          <CardContent className="space-y-5">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <div className="grid grid-cols-2 gap-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">

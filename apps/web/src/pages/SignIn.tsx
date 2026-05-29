@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLocation, Link } from 'wouter';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,6 +18,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function SignIn() {
+  usePageTitle('Sign In');
   const { signIn, signInWithGoogle, profile } = useAuth();
   const [, setLocation] = useLocation();
   const [serverError, setServerError] = useState('');

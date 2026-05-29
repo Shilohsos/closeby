@@ -6,6 +6,8 @@ import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import { useListings, useDeleteListing } from '@/hooks/useListings';
 import { useStorefront, useUpdateStorefront } from '@/hooks/useStorefront';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { useToast } from '@/providers/ToastProvider';
 import { formatPrice, CATEGORY_LABELS } from '@/components/ListingCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -24,10 +26,12 @@ const sfSchema = z.object({
 type SFValues = z.infer<typeof sfSchema>;
 
 export default function Profile() {
+  usePageTitle('My Profile');
   const { user, profile } = useAuth();
+  const { toast } = useToast();
   const userId = user?.id ?? '';
 
-  const { data: listingsData, isLoading: listingsLoading } = useListings({ userId, limit: 50 });
+  const { data: listingsData, isLoading: listingsLoading, isError: listingsError, refetch: refetchListings } = useListings({ userId, limit: 50 });
   const { data: storefrontData, isLoading: sfLoading } = useStorefront(userId);
   const deleteMutation = useDeleteListing();
   const updateSf = useUpdateStorefront();
@@ -47,12 +51,13 @@ export default function Profile() {
     setDeleteId(id);
     await deleteMutation.mutateAsync(id);
     setDeleteId(null);
+    toast({ title: 'Listing deleted', variant: 'default' });
   }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="flex items-center gap-4 mb-8">
-        <div className="w-14 h-14 rounded-full bg-secondary overflow-hidden flex items-center justify-center text-2xl">
+        <div className="w-14 h-14 rounded-full bg-secondary overflow-hidden flex items-center justify-center text-2xl flex-shrink-0">
           {storefrontData?.data?.avatarUrl
             ? <img src={storefrontData.data.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
             : '👤'
@@ -74,6 +79,11 @@ export default function Profile() {
         <TabsContent value="listings">
           {listingsLoading ? (
             <div className="space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)}</div>
+          ) : listingsError ? (
+            <div className="text-center py-12 space-y-3">
+              <p className="text-muted-foreground">Could not load your listings.</p>
+              <Button variant="outline" size="sm" onClick={() => refetchListings()}>Retry</Button>
+            </div>
           ) : !listingsData?.data.length ? (
             <div className="text-center py-12 text-muted-foreground">
               <p className="mb-3">No listings yet.</p>
@@ -116,7 +126,13 @@ export default function Profile() {
             <div className="space-y-4"><Skeleton className="h-10 w-full" /><Skeleton className="h-24 w-full" /><Skeleton className="h-10 w-full" /></div>
           ) : (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit((v) => updateSf.mutateAsync({ ...v, avatarUrl: v.avatarUrl || null }))} className="space-y-5 max-w-lg">
+              <form
+                onSubmit={form.handleSubmit(async (v) => {
+                  await updateSf.mutateAsync({ ...v, avatarUrl: v.avatarUrl || null });
+                  toast({ title: 'Storefront saved', variant: 'success' });
+                })}
+                className="space-y-5 max-w-lg"
+              >
                 <FormField control={form.control} name="avatarUrl" render={({ field }) => (
                   <FormItem><FormLabel>Avatar URL</FormLabel><FormControl><Input type="url" placeholder="https://…" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
@@ -127,7 +143,6 @@ export default function Profile() {
                   <FormItem><FormLabel>Phone <span className="text-muted-foreground text-xs">(contact relay only)</span></FormLabel><FormControl><Input placeholder="080XXXXXXXX" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 {updateSf.isError && <p className="text-sm text-destructive">{(updateSf.error as Error).message}</p>}
-                {updateSf.isSuccess && <p className="text-sm text-primary">Saved!</p>}
                 <Button type="submit" disabled={updateSf.isPending}>{updateSf.isPending ? 'Saving…' : 'Save Storefront'}</Button>
               </form>
             </Form>
